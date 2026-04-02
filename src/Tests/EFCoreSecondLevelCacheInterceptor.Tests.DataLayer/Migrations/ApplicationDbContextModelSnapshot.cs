@@ -17,7 +17,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -31,6 +31,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlogId"));
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BlogId");
@@ -56,6 +57,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SiteUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("BlogData");
@@ -117,6 +119,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -168,6 +171,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Notes")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
@@ -240,6 +244,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -320,6 +325,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<byte[]>("ByteArrayValue")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<byte>("ByteValue")
@@ -345,6 +351,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("ImageData")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<bool>("IsActive")
@@ -393,6 +400,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                             DoubleValue = 1.3,
                             FloatValue = 1.2f,
                             GuidValue = new Guid("236bbe40-b861-433c-8789-b152a99cfe3e"),
+                            ImageData = new byte[0],
                             IsActive = true,
                             Name = "User1",
                             Points = 1000L,
@@ -463,9 +471,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                                 .HasForeignKey("EngineVersionId");
                         });
 
-                    b.Navigation("Commercial");
+                    b.Navigation("Commercial")
+                        .IsRequired();
 
-                    b.Navigation("Retail");
+                    b.Navigation("Retail")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Post", b =>

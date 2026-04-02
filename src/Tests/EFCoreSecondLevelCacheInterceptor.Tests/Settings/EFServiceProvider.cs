@@ -555,11 +555,11 @@ public static class EFServiceProvider
             {
                 foreach (var action in actions)
                 {
-                    using (var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
-                    {
+                    var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    
                         await action(context,
                             (DebugLoggerProvider)serviceProvider.GetRequiredService<ILoggerProvider>());
-                    }
+                    
                 }
             }
         }

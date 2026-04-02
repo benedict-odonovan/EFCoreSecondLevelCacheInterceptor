@@ -7,28 +7,34 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201015070026_V2020_10_15_1029")]
-    partial class V2020_10_15_1029
+    [Migration("20260402144250_V_04_2026_1542")]
+    partial class V_04_2026_1542
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.0-rc.2.20475.6");
+                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Blog", b =>
                 {
                     b.Property<int>("BlogId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlogId"));
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BlogId");
@@ -54,6 +60,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SiteUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("BlogData");
@@ -63,8 +70,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("AddDate")
                         .HasColumnType("datetime2");
@@ -93,8 +101,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.HasKey("Id");
 
@@ -105,13 +114,15 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -119,7 +130,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 
                     b.Property<string>("post_type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.HasKey("Id");
 
@@ -130,6 +142,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.ToTable("Posts");
 
                     b.HasDiscriminator<string>("post_type").HasValue("post_base");
+
+                    b.UseTphMappingStrategy();
 
                     b.HasData(
                         new
@@ -152,13 +166,15 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 {
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Notes")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
@@ -226,10 +242,12 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -302,13 +320,15 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("AddDate")
                         .HasColumnType("datetime2");
 
                     b.Property<byte[]>("ByteArrayValue")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<byte>("ByteValue")
@@ -334,6 +354,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("ImageData")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<bool>("IsActive")
@@ -382,6 +403,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                             DoubleValue = 1.3,
                             FloatValue = 1.2f,
                             GuidValue = new Guid("236bbe40-b861-433c-8789-b152a99cfe3e"),
+                            ImageData = new byte[0],
                             IsActive = true,
                             Name = "User1",
                             Points = 1000L,
@@ -405,9 +427,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.OwnsOne("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.EngineProductVersion", "Commercial", b1 =>
                         {
                             b1.Property<int>("EngineVersionId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int")
-                                .UseIdentityColumn();
+                                .HasColumnType("int");
 
                             b1.Property<int>("Major")
                                 .HasColumnType("int");
@@ -432,9 +452,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.OwnsOne("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.EngineProductVersion", "Retail", b1 =>
                         {
                             b1.Property<int>("EngineVersionId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int")
-                                .UseIdentityColumn();
+                                .HasColumnType("int");
 
                             b1.Property<int>("Major")
                                 .HasColumnType("int");
@@ -456,9 +474,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                                 .HasForeignKey("EngineVersionId");
                         });
 
-                    b.Navigation("Commercial");
+                    b.Navigation("Commercial")
+                        .IsRequired();
 
-                    b.Navigation("Retail");
+                    b.Navigation("Retail")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Post", b =>
