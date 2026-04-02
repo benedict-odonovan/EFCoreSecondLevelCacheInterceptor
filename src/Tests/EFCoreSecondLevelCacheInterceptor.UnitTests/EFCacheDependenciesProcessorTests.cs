@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Assert = Xunit.Assert;
@@ -32,7 +32,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksWithNormalEFQueries()
+    public async Task TestGetCacheDependenciesWorksWithNormalEFQueries()
     {
         // Arrange
         const string commandText = @"-- EFCachePolicy[TestCachingByteArrays(line 391)] --> Absolute|00:45:00|||False
@@ -42,7 +42,7 @@ public class EFCacheDependenciesProcessorTests
       WHERE [u].[Id] = @__user1_Id_0]";
 
         // Act        
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         // Assert
@@ -50,7 +50,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorks()
+    public async Task TestGetCacheDependenciesWorks()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -60,7 +60,7 @@ public class EFCacheDependenciesProcessorTests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
       ORDER BY [p].[Id]";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
@@ -69,7 +69,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksWithSchemas()
+    public async Task TestGetCacheDependenciesWorksWithSchemas()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -79,7 +79,7 @@ public class EFCacheDependenciesProcessorTests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
       ORDER BY [p].[Id]";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
@@ -88,7 +88,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksWithASquareBracketInsideAStringValue()
+    public async Task TestGetCacheDependenciesWorksWithASquareBracketInsideAStringValue()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -98,7 +98,7 @@ public class EFCacheDependenciesProcessorTests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0) and [u].[Name]=' [Products] '
       ORDER BY [p].[Id]";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
@@ -107,7 +107,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksWithAQuoteInsideAStringValue()
+    public async Task TestGetCacheDependenciesWorksWithAQuoteInsideAStringValue()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -117,7 +117,7 @@ public class EFCacheDependenciesProcessorTests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0) and [u].[Name]=' ""Products"" '
       ORDER BY [p].[Id]";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
@@ -126,7 +126,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForInserts()
+    public async Task TestGetCacheDependenciesWorksForInserts()
     {
         const string commandText = @"SET NOCOUNT ON;
         INSERT INTO [Products] ([IsActive], [Notes], [ProductName], [ProductNumber], [UserId])
@@ -135,7 +135,7 @@ public class EFCacheDependenciesProcessorTests
         FROM [Products]
         WHERE @@ROWCOUNT = 1 AND [ProductId] = scope_identity();";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
@@ -144,7 +144,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForInsertsWithBacktick()
+    public async Task TestGetCacheDependenciesWorksForInsertsWithBacktick()
     {
         const string commandText = @"SET NOCOUNT ON;
         INSERT INTO `Products` (`IsActive`, `Notes`, `ProductName`, `ProductNumber`, `UserId`)
@@ -153,7 +153,7 @@ public class EFCacheDependenciesProcessorTests
         FROM `Products`
         WHERE @@ROWCOUNT = 1 AND `ProductId` = scope_identity();";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
@@ -162,14 +162,14 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForDeletes()
+    public async Task TestGetCacheDependenciesWorksForDeletes()
     {
         const string commandText = @"SET NOCOUNT ON;
         DELETE FROM [Products]
         WHERE [ProductId] = @p0;
         SELECT @@ROWCOUNT;";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
@@ -178,14 +178,14 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForUpdates()
+    public async Task TestGetCacheDependenciesWorksForUpdates()
     {
         const string commandText = @"SET NOCOUNT ON;
       UPDATE [Users] SET [UserStatus] = @p0
       WHERE [Id] = @p1;
       SELECT @@ROWCOUNT;";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Users"];
@@ -194,7 +194,7 @@ public class EFCacheDependenciesProcessorTests
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForBatchInserts()
+    public async Task TestGetCacheDependenciesWorksForBatchInserts()
     {
         const string commandText = @"SET NOCOUNT ON;
 DECLARE @inserted2 TABLE ([BlogId] int, [_Position] [int]);
@@ -211,7 +211,7 @@ VALUES (i.[Name], i.[Url])
 OUTPUT INSERTED.[BlogId], i._Position
 INTO @inserted2;";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Blogs", "Posts"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Blogs"];
@@ -220,13 +220,13 @@ INTO @inserted2;";
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForBulkInsertOrUpdate()
+    public async Task TestGetCacheDependenciesWorksForBulkInsertOrUpdate()
     {
         const string commandText =
             @"MERGE [dbo].[People] WITH (HOLDLOCK) AS T USING (SELECT TOP 2 * FROM [dbo].[PeopleTemp94f5cba8] ORDER BY [Id]) AS S ON T.[Id] = S.[Id] WHEN NOT MATCHED BY TARGET THEN INSERT ([Name]) VALUES (S.[Name]) WHEN MATCHED AND EXISTS (SELECT S.[Name] EXCEPT SELECT T.[Name]) THEN UPDATE SET T.[Name] = S.[Name];";
 
         var cacheDependencies =
-            _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), ["People"], commandText);
+            await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), ["People"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}People"];
 
@@ -234,7 +234,7 @@ INTO @inserted2;";
     }
 
     [Fact]
-    public void TestGetCacheDependenciesWorksForQueryHints()
+    public async Task TestGetCacheDependenciesWorksForQueryHints()
     {
         const string commandText = @"SET NOCOUNT ON;
         INSERT INTO [Products] ([IsActive], [Notes], [ProductName], [ProductNumber], [UserId])
@@ -243,7 +243,7 @@ INTO @inserted2;";
         FROM [Products]
         WHERE @@ROWCOUNT = 1 AND [ProductId] = scope_identity() FOR UPDATE";
 
-        var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+        var cacheDependencies = await _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];

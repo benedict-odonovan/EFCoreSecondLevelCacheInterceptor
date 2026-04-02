@@ -6,11 +6,11 @@ namespace Issue125EF5x;
 
 internal static class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         initDb();
 
-        EFServiceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
+        await EFServiceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
 
         EFServiceProvider.RunInContext(context =>
         {

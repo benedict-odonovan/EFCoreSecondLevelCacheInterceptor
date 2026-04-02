@@ -19,7 +19,7 @@ public class EFHybridCacheProvider(
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+    public async Task InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
         ArgumentNullException.ThrowIfNull(cachePolicy);
@@ -29,14 +29,11 @@ public class EFHybridCacheProvider(
             IsNull = true
         };
 
-        hybridCache.SetAsync(cacheKey.KeyHash, value, new HybridCacheEntryOptions
+        await hybridCache.SetAsync(cacheKey.KeyHash, value, new HybridCacheEntryOptions
             {
                 Expiration = cachePolicy.CacheTimeout,
                 LocalCacheExpiration = cachePolicy.CacheTimeout
-            }, cacheKey.CacheDependencies)
-            .Preserve()
-            .GetAwaiter()
-            .GetResult();
+            }, cacheKey.CacheDependencies);
 
         cacheDependenciesStore.AddCacheDependencies(cacheKey.CacheDependencies);
     }
@@ -44,7 +41,7 @@ public class EFHybridCacheProvider(
     /// <summary>
     ///     Removes the cached entries added by this library.
     /// </summary>
-    public void ClearAllCachedEntries()
+    public async Task ClearAllCachedEntries()
     {
         InvalidateTaggedEntries(cacheDependenciesStore.GetAllCacheDependencies());
 
@@ -58,7 +55,7 @@ public class EFHybridCacheProvider(
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public async Task<EFCachedData?> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
 
@@ -73,7 +70,7 @@ public class EFHybridCacheProvider(
     ///     Invalidates all the cache entries which are dependent on any of the specified root keys.
     /// </summary>
     /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
-    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    public async Task InvalidateCacheDependencies(EFCacheKey cacheKey)
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
 

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Assert = Xunit.Assert;
@@ -8,7 +8,7 @@ namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 public class EFCacheServiceProviderTests
 {
     [Fact]
-    public void TestCacheInvalidationWithTwoRoots()
+    public async Task TestCacheInvalidationWithTwoRoots()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
@@ -24,7 +24,7 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key1"
         };
 
-        efCacheServiceProvider.InsertValue(key1, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key1, new EFCachedData
         {
             Scalar = "value1"
         }, efCachePolicy);
@@ -38,18 +38,18 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key2"
         };
 
-        efCacheServiceProvider.InsertValue(key2, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key2, new EFCachedData
         {
             Scalar = "value2"
         }, efCachePolicy);
 
-        var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        var value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.NotNull(value1);
 
-        var value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
+        var value2 = await efCacheServiceProvider.GetValue(key2, efCachePolicy);
         Assert.NotNull(value2);
 
-        efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
+        await efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
             "entity2.model"
         })
@@ -57,15 +57,15 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key1"
         });
 
-        value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.Null(value1);
 
-        value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
+        value2 = await efCacheServiceProvider.GetValue(key2, efCachePolicy);
         Assert.Null(value2);
     }
 
     [Fact]
-    public void TestCacheInvalidationWithOneRoot()
+    public async Task TestCacheInvalidationWithOneRoot()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
@@ -80,7 +80,7 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key1"
         };
 
-        efCacheServiceProvider.InsertValue(key1, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key1, new EFCachedData
         {
             Scalar = "value1"
         }, efCachePolicy);
@@ -93,18 +93,18 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key2"
         };
 
-        efCacheServiceProvider.InsertValue(key2, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key2, new EFCachedData
         {
             Scalar = "value2"
         }, efCachePolicy);
 
-        var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        var value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.NotNull(value1);
 
-        var value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
+        var value2 = await efCacheServiceProvider.GetValue(key2, efCachePolicy);
         Assert.NotNull(value2);
 
-        efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
+        await efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
             "entity1"
         })
@@ -112,15 +112,15 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key2"
         });
 
-        value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.Null(value1);
 
-        value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
+        value2 = await efCacheServiceProvider.GetValue(key2, efCachePolicy);
         Assert.Null(value2);
     }
 
     [Fact]
-    public void TestObjectCacheInvalidationWithOneRoot()
+    public async Task TestObjectCacheInvalidationWithOneRoot()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
@@ -129,7 +129,7 @@ public class EFCacheServiceProviderTests
 
         const string rootCacheKey = "EFSecondLevelCache.Core.AspNetCoreSample.DataLayer.Entities.Product";
 
-        efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
+        await efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
             rootCacheKey
         })
@@ -145,10 +145,10 @@ public class EFCacheServiceProviderTests
             KeyHash = "11888622"
         };
 
-        var val11888622 = efCacheServiceProvider.GetValue(key11888622, efCachePolicy);
+        var val11888622 = await efCacheServiceProvider.GetValue(key11888622, efCachePolicy);
         Assert.Null(val11888622);
 
-        efCacheServiceProvider.InsertValue(key11888622, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key11888622, new EFCachedData
         {
             Scalar = "Test1"
         }, efCachePolicy);
@@ -161,15 +161,15 @@ public class EFCacheServiceProviderTests
             KeyHash = "44513A63"
         };
 
-        var val44513A63 = efCacheServiceProvider.GetValue(key44513A63, efCachePolicy);
+        var val44513A63 = await efCacheServiceProvider.GetValue(key44513A63, efCachePolicy);
         Assert.Null(val44513A63);
 
-        efCacheServiceProvider.InsertValue(key44513A63, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key44513A63, new EFCachedData
         {
             Scalar = "Test1"
         }, efCachePolicy);
 
-        efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
+        await efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
             rootCacheKey
         })
@@ -177,15 +177,15 @@ public class EFCacheServiceProviderTests
             KeyHash = "44513A63"
         });
 
-        val11888622 = efCacheServiceProvider.GetValue(key11888622, efCachePolicy);
+        val11888622 = await efCacheServiceProvider.GetValue(key11888622, efCachePolicy);
         Assert.Null(val11888622);
 
-        val44513A63 = efCacheServiceProvider.GetValue(key44513A63, efCachePolicy);
+        val44513A63 = await efCacheServiceProvider.GetValue(key44513A63, efCachePolicy);
         Assert.Null(val44513A63);
     }
 
     [Fact]
-    public void TestCacheInvalidationWithSimilarRoots()
+    public async Task TestCacheInvalidationWithSimilarRoots()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
@@ -201,7 +201,7 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key1"
         };
 
-        efCacheServiceProvider.InsertValue(key1, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key1, new EFCachedData
         {
             Scalar = "value1"
         }, efCachePolicy);
@@ -214,18 +214,18 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key2"
         };
 
-        efCacheServiceProvider.InsertValue(key2, new EFCachedData
+        await efCacheServiceProvider.InsertValue(key2, new EFCachedData
         {
             Scalar = "value2"
         }, efCachePolicy);
 
-        var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        var value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.NotNull(value1);
 
-        var value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
+        var value2 = await efCacheServiceProvider.GetValue(key2, efCachePolicy);
         Assert.NotNull(value2);
 
-        efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
+        await efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
             "entity2"
         })
@@ -233,15 +233,15 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key2"
         });
 
-        value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.Null(value1);
 
-        value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
+        value2 = await efCacheServiceProvider.GetValue(key2, efCachePolicy);
         Assert.Null(value2);
     }
 
     [Fact]
-    public void TestInsertingNullValues()
+    public async Task TestInsertingNullValues()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
@@ -257,9 +257,9 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key1"
         };
 
-        efCacheServiceProvider.InsertValue(key1, value: null, efCachePolicy);
+        await efCacheServiceProvider.InsertValue(key1, value: null, efCachePolicy);
 
-        var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
+        var value1 = await efCacheServiceProvider.GetValue(key1, efCachePolicy);
         Assert.True(value1.IsNull, $"value1 is `{value1}`");
     }
 
@@ -274,7 +274,7 @@ public class EFCacheServiceProviderTests
 
         await Task.WhenAll(Task.Run(InsertValues), Task.Run(InvalidateCacheDependencies));
 
-        void InsertValues()
+        async Task InsertValues()
         {
             for (var i = 0; i < 10000; i++)
             {
@@ -286,14 +286,14 @@ public class EFCacheServiceProviderTests
                     KeyHash = $"EF_key{i}"
                 };
 
-                efCacheServiceProvider.InsertValue(key, new EFCachedData
+                await efCacheServiceProvider.InsertValue(key, new EFCachedData
                 {
                     Scalar = $"value{i}"
                 }, efCachePolicy);
             }
         }
 
-        void InvalidateCacheDependencies()
+        async Task InvalidateCacheDependencies()
         {
             var defaultKey = new EFCacheKey(new HashSet<string>
             {
@@ -303,20 +303,20 @@ public class EFCacheServiceProviderTests
                 KeyHash = "EF_key"
             };
 
-            efCacheServiceProvider.InsertValue(defaultKey, new EFCachedData
+            await efCacheServiceProvider.InsertValue(defaultKey, new EFCachedData
             {
                 Scalar = "value"
             }, efCachePolicy);
 
             for (var i = 0; i < 5000; i++)
             {
-                efCacheServiceProvider.InvalidateCacheDependencies(defaultKey);
+                await efCacheServiceProvider.InvalidateCacheDependencies(defaultKey);
             }
         }
     }
 
     [Fact]
-    public void TestParallelCacheInsertAndInvalidation()
+    public async Task TestParallelCacheInsertAndInvalidation()
     {
         const string rootKey = "entity1";
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -332,7 +332,7 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key"
         };
 
-        efCacheServiceProvider.InsertValue(defaultKey, new EFCachedData
+        await efCacheServiceProvider.InsertValue(defaultKey, new EFCachedData
         {
             Scalar = "value"
         }, efCachePolicy);
@@ -356,17 +356,17 @@ public class EFCacheServiceProviderTests
                 efCacheServiceProvider.InsertValue(key, new EFCachedData
                 {
                     Scalar = $"value{i1}"
-                }, efCachePolicy);
+                }, efCachePolicy).Wait();
             });
 
-            tests.Add(() => efCacheServiceProvider.InvalidateCacheDependencies(defaultKey));
+            tests.Add(() => efCacheServiceProvider.InvalidateCacheDependencies(defaultKey).Wait());
         }
 
         Parallel.Invoke(tests.OrderBy(a => Random.Shared.Next()).ToArray());
     }
 
     [Fact]
-    public void TestParallelInsertsAndRemoves()
+    public async Task TestParallelInsertsAndRemoves()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
@@ -404,7 +404,7 @@ public class EFCacheServiceProviderTests
                 })
                 {
                     KeyHash = $"EF_key{i1}"
-                }));
+                }).Wait());
             }
             else
             {
@@ -414,13 +414,13 @@ public class EFCacheServiceProviderTests
                 })
                 {
                     KeyHash = $"EF_key{i1}"
-                }));
+                }).Wait());
             }
         }
 
         Parallel.Invoke(tests.OrderBy(a => Random.Shared.Next()).ToArray());
 
-        var value1 = efCacheServiceProvider.GetValue(new EFCacheKey(new HashSet<string>
+        var value1 = await efCacheServiceProvider.GetValue(new EFCacheKey(new HashSet<string>
         {
             "entity1",
             "entity2"

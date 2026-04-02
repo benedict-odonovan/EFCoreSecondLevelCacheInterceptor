@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -13,10 +13,10 @@ public class EFStackExchangeRedisCacheProvider(
 {
     private ConnectionMultiplexer? _redisConnection;
 
-    private ConnectionMultiplexer RedisConnection => _redisConnection ??= GetRedisConnection();
+    private ConnectionMultiplexer RedisConnection => _redisConnection ??= GetRedisConnection().Result;
 
     /// <inheritdoc />
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+    public async Task InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -47,28 +47,26 @@ public class EFStackExchangeRedisCacheProvider(
             {
                 var expiryTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
                                  cachePolicy.CacheTimeout.Value.TotalMilliseconds;
-
-                redisDb.SortedSetAdd(rootCacheKey, keyHash, expiryTime);
+                await redisDb.SortedSetAddAsync(rootCacheKey, keyHash, expiryTime);
             }
             else
             {
-                redisDb.SortedSetAdd(rootCacheKey, keyHash,
+                await redisDb.SortedSetAddAsync(rootCacheKey, keyHash,
                     long.MaxValue - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             }
         }
 
         var data = dataSerializer.Serialize(value);
-
-        redisDb.StringSet(keyHash, data, cachePolicy.CacheTimeout, When.Always);
+        await redisDb.StringSetAsync(keyHash, data, cachePolicy.CacheTimeout, When.Always);
     }
 
     /// <inheritdoc />
-    public void ClearAllCachedEntries()
+    public async Task ClearAllCachedEntries()
         => logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
             new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
     /// <inheritdoc />
-    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public async Task<EFCachedData?> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -76,20 +74,20 @@ public class EFStackExchangeRedisCacheProvider(
         }
 
         var redisDb = RedisConnection.GetDatabase();
-        var maybeValue = redisDb.StringGet(cacheKey.KeyHash);
+        var maybeValue = await redisDb.StringGetAsync(cacheKey.KeyHash);
 
         if (!maybeValue.HasValue)
         {
             return null;
         }
 
-        ManageSlidingExpiration(cacheKey, cachePolicy, redisDb);
+        await ManageSlidingExpiration(cacheKey, cachePolicy, redisDb);
 
         return dataSerializer.Deserialize<EFCachedData>(maybeValue);
     }
 
     /// <inheritdoc />
-    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    public async Task InvalidateCacheDependencies(EFCacheKey cacheKey)
     {
         if (cacheKey is null)
         {
@@ -107,29 +105,29 @@ public class EFStackExchangeRedisCacheProvider(
 
             var dependencyKeys = new HashSet<string>(StringComparer.Ordinal);
 
-            foreach (var item in redisDb.SortedSetScan(rootCacheKey))
+            await foreach (var item in redisDb.SortedSetScanAsync(rootCacheKey))
             {
                 _ = dependencyKeys.Add(item.Element.ToString());
             }
 
             if (dependencyKeys.Count > 0)
             {
-                redisDb.KeyDelete([.. dependencyKeys]);
+                await redisDb.KeyDeleteAsync([.. dependencyKeys]);
             }
 
-            redisDb.KeyDelete(rootCacheKey);
+            await redisDb.KeyDeleteAsync(rootCacheKey);
         }
     }
 
-    private static void ManageSlidingExpiration(EFCacheKey cacheKey, EFCachePolicy cachePolicy, IDatabase redisDb)
+    private static async Task ManageSlidingExpiration(EFCacheKey cacheKey, EFCachePolicy cachePolicy, IDatabase redisDb)
     {
         if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding && cachePolicy.CacheTimeout != TimeSpan.Zero)
         {
-            redisDb.KeyExpire(cacheKey.KeyHash, cachePolicy.CacheTimeout, CommandFlags.FireAndForget);
+            await redisDb.KeyExpireAsync(cacheKey.KeyHash, cachePolicy.CacheTimeout, CommandFlags.FireAndForget);
         }
     }
 
-    private ConnectionMultiplexer GetRedisConnection()
+    private async Task<ConnectionMultiplexer> GetRedisConnection()
     {
         var options = cacheSettings.Value.AdditionalData as EFRedisCacheConfigurationOptions ??
                       throw new InvalidOperationException(
@@ -137,12 +135,12 @@ public class EFStackExchangeRedisCacheProvider(
 
         if (options.RedisConnectionString is not null)
         {
-            return ConnectionMultiplexer.Connect(options.RedisConnectionString);
+            return await ConnectionMultiplexer.ConnectAsync(options.RedisConnectionString);
         }
 
         if (options.ConfigurationOptions is not null)
         {
-            return ConnectionMultiplexer.Connect(options.ConfigurationOptions);
+            return await ConnectionMultiplexer.ConnectAsync(options.ConfigurationOptions);
         }
 
         throw new InvalidOperationException(

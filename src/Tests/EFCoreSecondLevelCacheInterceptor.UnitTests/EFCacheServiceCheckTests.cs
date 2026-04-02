@@ -114,7 +114,7 @@ public class EFCacheServiceCheckTests
         _cacheSettings.UseDbCallsIfCachingProviderIsDown = true;
 
         _cacheServiceProviderMock.Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
-            .Returns(new EFCachedData());
+            .ReturnsAsync(new EFCachedData());
 
         // Act
         var result = _serviceCheck.IsCacheServiceAvailable();
@@ -150,7 +150,7 @@ public class EFCacheServiceCheckTests
         _cacheSettings.NextCacheServerAvailabilityCheck = TimeSpan.MaxValue;
 
         _cacheServiceProviderMock.Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
-            .Returns(new EFCachedData());
+            .ReturnsAsync(new EFCachedData());
 
         _serviceCheck.IsCacheServiceAvailable();
 

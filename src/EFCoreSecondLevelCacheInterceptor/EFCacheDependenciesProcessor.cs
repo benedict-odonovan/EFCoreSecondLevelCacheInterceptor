@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -47,7 +47,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     /// <summary>
     ///     Finds the related table names of the current query.
     /// </summary>
-    public SortedSet<string> GetCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
+    public async Task<SortedSet<string>> GetCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
     {
         if (command == null)
         {
@@ -57,13 +57,13 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         var tableNames = new SortedSet<string>(_sqlCommandsProcessor.GetAllTableNames(context).Select(x => x.TableName),
             StringComparer.OrdinalIgnoreCase);
 
-        return GetCacheDependencies(cachePolicy, tableNames, command.CommandText);
+        return await GetCacheDependencies(cachePolicy, tableNames, command.CommandText);
     }
 
     /// <summary>
     ///     Finds the related table names of the current query.
     /// </summary>
-    public SortedSet<string> GetCacheDependencies(EFCachePolicy cachePolicy,
+    public async Task<SortedSet<string>> GetCacheDependencies(EFCachePolicy cachePolicy,
         SortedSet<string> tableNames,
         string commandText)
     {
@@ -112,7 +112,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     /// <summary>
     ///     Invalidates all of the cache entries which are dependent on any of the specified root keys.
     /// </summary>
-    public bool InvalidateCacheDependencies(string commandText, EFCacheKey cacheKey)
+    public async Task<bool> InvalidateCacheDependencies(string commandText, EFCacheKey cacheKey)
     {
         if (cacheKey is null)
         {
@@ -147,7 +147,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
         var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
         cacheKey.CacheDependencies.Add($"{cacheKeyPrefix}{EFCachePolicy.UnknownsCacheDependency}");
-        _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
+        await _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
 
         if (_logger.IsLoggerEnabled)
         {

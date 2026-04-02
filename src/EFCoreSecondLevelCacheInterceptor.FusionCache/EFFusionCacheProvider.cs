@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -50,7 +50,7 @@ public sealed class EFFusionCacheProvider : IEFCacheServiceProvider, IDisposable
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+    public async Task InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
         ArgumentNullException.ThrowIfNull(cachePolicy);
@@ -60,7 +60,7 @@ public sealed class EFFusionCacheProvider : IEFCacheServiceProvider, IDisposable
             IsNull = true
         };
 
-        _fusionCache.Set(cacheKey.KeyHash, value, entryOptions =>
+        await _fusionCache.SetAsync(cacheKey.KeyHash, value, entryOptions =>
         {
             if (cachePolicy.CacheExpirationMode != CacheExpirationMode.NeverRemove && cachePolicy.CacheTimeout.HasValue)
             {
@@ -78,9 +78,9 @@ public sealed class EFFusionCacheProvider : IEFCacheServiceProvider, IDisposable
     /// <summary>
     ///     Removes the cached entries added by this library.
     /// </summary>
-    public void ClearAllCachedEntries()
+    public async Task ClearAllCachedEntries()
     {
-        _fusionCache.Clear();
+        await _fusionCache.ClearAsync();
 
         _logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
             new HashSet<string>(StringComparer.OrdinalIgnoreCase));
@@ -92,18 +92,18 @@ public sealed class EFFusionCacheProvider : IEFCacheServiceProvider, IDisposable
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public async Task<EFCachedData?> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
 
-        return _fusionCache.GetOrDefault<EFCachedData>(cacheKey.KeyHash);
+        return await _fusionCache.GetOrDefaultAsync<EFCachedData>(cacheKey.KeyHash);
     }
 
     /// <summary>
     ///     Invalidates all the cache entries which are dependent on any of the specified root keys.
     /// </summary>
     /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
-    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    public async Task InvalidateCacheDependencies(EFCacheKey cacheKey)
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
 

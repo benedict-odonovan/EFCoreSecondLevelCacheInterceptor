@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Assert = Xunit.Assert;
@@ -28,7 +28,7 @@ public class EFCachePolicyParserTests
     }
 
     [Fact]
-    public void TestGetEFCachePolicyWith2Parts()
+    public async Task TestGetEFCachePolicyWith2Parts()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -45,7 +45,7 @@ public class EFCachePolicyParserTests
     }
 
     [Fact]
-    public void TestGetEFCachePolicyWithNullTimeoutParts()
+    public async Task TestGetEFCachePolicyWithNullTimeoutParts()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> NeverRemove|
 
@@ -62,7 +62,7 @@ public class EFCachePolicyParserTests
     }
 
     [Fact]
-    public void TestGetEFCachePolicyWithAdditionalTagComments()
+    public async Task TestGetEFCachePolicyWithAdditionalTagComments()
     {
         const string commandText = @"-- CustomTagAbove
 
@@ -83,7 +83,7 @@ ORDER BY [p].[Id]";
     }
 
     [Fact]
-    public void TestGetEFCachePolicyWithAllParts()
+    public async Task TestGetEFCachePolicyWithAllParts()
     {
         var commandText = "-- " + EFCachePolicy.Configure(options
             => options.ExpirationMode(CacheExpirationMode.Absolute)
@@ -106,7 +106,7 @@ ORDER BY [p].[Id]";
     }
 
     [Fact]
-    public void TestGetEFCachePolicyWithNullParts()
+    public async Task TestGetEFCachePolicyWithNullParts()
     {
         var commandText = "-- " + EFCachePolicy.Configure(options
             => options.ExpirationMode(CacheExpirationMode.NeverRemove)
@@ -129,7 +129,7 @@ ORDER BY [p].[Id]";
     }
 
     [Fact]
-    public void TestRemoveEFCachePolicyTagWithAdditionalTagComments()
+    public async Task TestRemoveEFCachePolicyTagWithAdditionalTagComments()
     {
         const string commandText = @"-- CustomTagAbove
 

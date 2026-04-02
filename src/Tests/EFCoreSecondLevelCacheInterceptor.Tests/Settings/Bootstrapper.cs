@@ -1,6 +1,7 @@
-using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils;
+﻿using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
@@ -8,9 +9,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests;
 public static class Bootstrapper
 {
     [AssemblyInitialize]
-    public static void Initialize(TestContext context)
+    public static async Task Initialize(TestContext context)
     {
-        clearAllCachedEntries();
+        await clearAllCachedEntries();
         startDb();
     }
 
@@ -20,11 +21,11 @@ public static class Bootstrapper
         // Method intentionally left empty.
     }
 
-    private static void clearAllCachedEntries()
+    private static async Task clearAllCachedEntries()
     {
         try
         {
-            EFServiceProvider.GetCacheServiceProvider(TestCacheProvider.CacheManagerCoreRedis).ClearAllCachedEntries();
+            await (await EFServiceProvider.GetCacheServiceProvider(TestCacheProvider.CacheManagerCoreRedis)).ClearAllCachedEntries();
         }
         catch (Exception ex)
         {

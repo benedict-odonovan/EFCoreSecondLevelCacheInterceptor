@@ -1,4 +1,4 @@
-using CacheManager.Core;
+﻿using CacheManager.Core;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue9SQLiteInt32.DataLayer;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +35,7 @@ public static class EFServiceProvider
     public static async Task RunInContextAsync(Func<ApplicationDbContext, Task> action)
     {
         using var serviceScope = GetRequiredService<IServiceScopeFactory>().CreateScope();
-        using var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await using var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await action(context);
     }
 

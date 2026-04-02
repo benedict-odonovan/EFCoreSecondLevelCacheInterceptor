@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 InitDb();
 
-EFServiceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
+await EFServiceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
 
 EFServiceProvider.RunInContext(context =>
 {

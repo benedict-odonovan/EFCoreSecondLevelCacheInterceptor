@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
@@ -11,7 +11,7 @@ public class SecondLevelCacheInterceptorTransactionTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestQueriesUsingExplicitTransactionsWillNotUseTheCache(TestCacheProvider cacheProvider)
+    public async Task TestQueriesUsingExplicitTransactionsWillNotUseTheCache(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -56,7 +56,7 @@ public class SecondLevelCacheInterceptorTransactionTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestQueriesUsingExplicitTransactionsWillInvalidateTheCache(TestCacheProvider cacheProvider)
+    public async Task TestQueriesUsingExplicitTransactionsWillInvalidateTheCache(TestCacheProvider cacheProvider)
     {
         var rnd = new Random();
 

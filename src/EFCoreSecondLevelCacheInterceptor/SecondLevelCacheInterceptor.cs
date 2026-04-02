@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +33,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var @lock = _lockProvider.Lock();
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        return (_processor.ProcessExecutedCommands(command, eventData?.Context, result)).Result;
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        return await _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var @lock = _lockProvider.Lock();
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result).Result;
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        return await _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var @lock = _lockProvider.Lock();
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result).Result;
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        return await _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var @lock = _lockProvider.Lock();
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result).Result;
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        return await _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var @lock = _lockProvider.Lock();
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result).Result;
     }
 
     /// <summary>
@@ -184,7 +184,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        return await _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -196,7 +196,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var @lock = _lockProvider.Lock();
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result).Result;
     }
 
     /// <summary>
@@ -217,6 +217,6 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     {
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        return await _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 }

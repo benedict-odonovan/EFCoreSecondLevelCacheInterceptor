@@ -1,10 +1,10 @@
-namespace EFCoreSecondLevelCacheInterceptor.Tests;
+﻿namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
 [TestClass]
 public class EFCachePolicyParserTests
 {
     [TestMethod]
-    public void TestGetEFCachePolicyWith2Parts()
+    public async Task TestGetEFCachePolicyWith2Parts()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -23,7 +23,7 @@ public class EFCachePolicyParserTests
     }
 
     [TestMethod]
-    public void TestGetEFCachePolicyWithAdditionalTagComments()
+    public async Task TestGetEFCachePolicyWithAdditionalTagComments()
     {
         const string commandText = @"-- CustomTagAbove
 
@@ -46,7 +46,7 @@ ORDER BY [p].[Id]";
     }
 
     [TestMethod]
-    public void TestGetEFCachePolicyWithAllParts()
+    public async Task TestGetEFCachePolicyWithAllParts()
     {
         var commandText = "-- " + EFCachePolicy.Configure(options
             => options.ExpirationMode(CacheExpirationMode.Absolute)
@@ -70,7 +70,7 @@ ORDER BY [p].[Id]";
     }
 
     [TestMethod]
-    public void TestRemoveEFCachePolicyTagWithAdditionalTagComments()
+    public async Task TestRemoveEFCachePolicyTagWithAdditionalTagComments()
     {
         const string commandText = @"-- CustomTagAbove
 

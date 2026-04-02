@@ -6,39 +6,39 @@ using Microsoft.EntityFrameworkCore;
 
 InitDb();
 
-EFServiceProvider.RunInContext(context =>
+await EFServiceProvider.RunInContextAsync(async context =>
 {
-    TestLists(context);
-    TestArrays(context);
-    TestPeople(context);
+    await TestLists(context);
+    await TestArrays(context);
+    await TestPeople(context);
 });
 
-static void TestPeople(ApplicationDbContext context)
+static async Task TestPeople(ApplicationDbContext context)
 {
-    var people = context.People.Include(x => x.Addresses).Include(x => x.Books).ToList();
+    var people = await context.People.Include(x => x.Addresses).Include(x => x.Books).ToListAsync();
 
     foreach (var person in people)
     {
         Console.WriteLine($"{person.Id}, {person.Name}, {person.Addresses?.First().Name}");
     }
 
-    var cachedPeople = context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable().ToList();
-    cachedPeople = context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable().ToList();
+    var cachedPeople = await context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable().ToListAsync();
+    cachedPeople = await context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable().ToListAsync();
 
     foreach (var person in cachedPeople)
     {
         Console.WriteLine($"{person.Id}, {person.Name}, {person.CustomFieldDefinitionMetadata?.FieldName}");
     }
 
-    cachedPeople = context.People.Include(x => x.Addresses)
+    cachedPeople = await context.People.Include(x => x.Addresses)
         .Include(x => x.Books)
         .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 51))
-        .ToList();
+        .ToListAsync();
 
-    cachedPeople = context.People.Include(x => x.Addresses)
+    cachedPeople = await context.People.Include(x => x.Addresses)
         .Include(x => x.Books)
         .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 51))
-        .ToList();
+        .ToListAsync();
 
     foreach (var person in cachedPeople)
     {
@@ -46,7 +46,7 @@ static void TestPeople(ApplicationDbContext context)
     }
 }
 
-static void TestArrays(ApplicationDbContext context)
+static async Task TestArrays(ApplicationDbContext context)
 {
     var firstQueryResult = QueryArrays(context, [1, 3]);
 
@@ -69,7 +69,7 @@ static List<Entity> QueryArrays(ApplicationDbContext dbContext, int[] array)
         .Cacheable()
         .ToList();
 
-static void TestLists(ApplicationDbContext context)
+static async Task TestLists(ApplicationDbContext context)
 {
     var firstQueryResult = QueryLists(context, ["1", "2"]);
 

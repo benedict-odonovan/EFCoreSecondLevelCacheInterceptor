@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,7 +14,7 @@ public class SecondLevelCacheInterceptorInvalidationTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestInsertingDataIntoTheSameTableShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
+    public async Task TestInsertingDataIntoTheSameTableShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -246,7 +246,7 @@ public class SecondLevelCacheInterceptorInvalidationTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestRemoveDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
+    public async Task TestRemoveDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -294,7 +294,7 @@ public class SecondLevelCacheInterceptorInvalidationTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestRemoveTptDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
+    public async Task TestRemoveTptDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -327,7 +327,7 @@ public class SecondLevelCacheInterceptorInvalidationTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestAddThenRemoveDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
+    public async Task TestAddThenRemoveDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -424,7 +424,7 @@ public class SecondLevelCacheInterceptorInvalidationTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestCachingByteArrays(TestCacheProvider cacheProvider)
+    public async Task TestCachingByteArrays(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {

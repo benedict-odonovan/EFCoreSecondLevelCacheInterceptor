@@ -1,4 +1,4 @@
-using EasyCaching.Core.Configurations;
+﻿using EasyCaching.Core.Configurations;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue12PostgreSql.DataLayer;
 using MessagePack;
@@ -37,7 +37,7 @@ public static class EFServiceProvider
     public static async Task RunInContextAsync(Func<ApplicationDbContext, Task> action)
     {
         using var serviceScope = GetRequiredService<IServiceScopeFactory>().CreateScope();
-        using var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await using var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await action(context);
     }
 

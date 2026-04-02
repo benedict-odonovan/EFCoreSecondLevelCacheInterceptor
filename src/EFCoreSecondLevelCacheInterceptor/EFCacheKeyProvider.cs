@@ -64,7 +64,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
     /// <param name="context">DbContext is a combination of the Unit Of Work and Repository patterns.</param>
     /// <param name="cachePolicy">determines the Expiration time of the cache.</param>
     /// <returns>Information of the computed key of the input LINQ query.</returns>
-    public EFCacheKey GetEFCacheKey(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
+    public async Task<EFCacheKey> GetEFCacheKey(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
     {
         if (context is null)
         {
@@ -89,7 +89,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
             : $"{_hashProvider.ComputeHash(cacheKey):X}";
 
         var cacheDbContextType = context.GetType();
-        var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
+        var cacheDependencies = await _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
 
         if (_logger.IsLoggerEnabled)
         {

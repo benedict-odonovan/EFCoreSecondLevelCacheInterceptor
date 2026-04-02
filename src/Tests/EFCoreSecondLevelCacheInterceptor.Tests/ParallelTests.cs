@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
@@ -12,7 +12,7 @@ public class ParallelTests
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
-    public virtual void TestParallelQueries(TestCacheProvider cacheProvider)
+    public virtual async Task TestParallelQueries(TestCacheProvider cacheProvider)
     {
         var tests = new List<Action>();
         const int loopCount = 30;

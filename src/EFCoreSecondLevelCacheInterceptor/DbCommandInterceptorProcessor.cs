@@ -1,4 +1,4 @@
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -52,7 +52,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     /// <summary>
     ///     Reads data from cache or cache it and then returns the result
     /// </summary>
-    public T ProcessExecutedCommands<T>(DbCommand command, DbContext? context, T result)
+    public async Task<T> ProcessExecutedCommands<T>(DbCommand command, DbContext? context, T result)
     {
         if (context is null || command is null)
         {
@@ -90,9 +90,9 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             }
 
             var commandText = command.CommandText;
-            efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy ?? new EFCachePolicy());
+            efCacheKey = await _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy ?? new EFCachePolicy());
 
-            if (_cacheDependenciesProcessor.InvalidateCacheDependencies(commandText, efCacheKey))
+            if (await _cacheDependenciesProcessor.InvalidateCacheDependencies(commandText, efCacheKey))
             {
                 return result;
             }
@@ -113,7 +113,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             {
                 if (!_ignoreCachingProcessor.ShouldSkipCachingResults(commandText, data))
                 {
-                    _cacheService.InsertValue(efCacheKey, new EFCachedData
+                    await _cacheService.InsertValue(efCacheKey, new EFCachedData
                     {
                         NonQuery = data
                     }, cachePolicy);
@@ -134,7 +134,6 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             if (result is DbDataReader dataReader)
             {
                 EFTableRows tableRows;
-
                 using (var dbReaderLoader = new EFDataReaderLoader(dataReader))
                 {
                     tableRows = dbReaderLoader.Load();
@@ -142,7 +141,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
                 if (!_ignoreCachingProcessor.ShouldSkipCachingResults(commandText, tableRows))
                 {
-                    _cacheService.InsertValue(efCacheKey, new EFCachedData
+                    await _cacheService.InsertValue(efCacheKey, new EFCachedData
                     {
                         TableRows = tableRows
                     }, cachePolicy);
@@ -168,7 +167,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             {
                 if (!_ignoreCachingProcessor.ShouldSkipCachingResults(commandText, result))
                 {
-                    _cacheService.InsertValue(efCacheKey, new EFCachedData
+                    await _cacheService.InsertValue(efCacheKey, new EFCachedData
                     {
                         Scalar = result
                     }, cachePolicy);
@@ -210,7 +209,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     /// <summary>
     ///     Reads command's data from the cache, if any.
     /// </summary>
-    public T ProcessExecutingCommands<T>(DbCommand command, DbContext? context, T result)
+    public async Task<T> ProcessExecutingCommands<T>(DbCommand command, DbContext? context, T result)
     {
         if (context is null || command is null)
         {
@@ -247,9 +246,9 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 return result;
             }
 
-            efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
+            efCacheKey = await _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
-            if (_cacheService.GetValue(efCacheKey, cachePolicy) is not { } cacheResult)
+            if (await _cacheService.GetValue(efCacheKey, cachePolicy) is not { } cacheResult)
             {
                 if (_logger.IsLoggerEnabled)
                 {

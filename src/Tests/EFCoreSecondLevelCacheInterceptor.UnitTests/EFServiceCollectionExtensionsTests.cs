@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Assert = Xunit.Assert;
@@ -9,7 +9,7 @@ namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 public class EFServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddEFSecondLevelCache_ThrowsArgumentNullException_WhenOptionsIsNull()
+    public async Task AddEFSecondLevelCache_ThrowsArgumentNullException_WhenOptionsIsNull()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -19,7 +19,7 @@ public class EFServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddEFSecondLevelCache_RegistersRequiredServices()
+    public async Task AddEFSecondLevelCache_RegistersRequiredServices()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -45,7 +45,7 @@ public class EFServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddEFSecondLevelCache_RegistersDefaultHashProvider_WhenHashProviderIsNull()
+    public async Task AddEFSecondLevelCache_RegistersDefaultHashProvider_WhenHashProviderIsNull()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -64,7 +64,7 @@ public class EFServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddEFSecondLevelCache_RegistersCustomHashProvider_WhenHashProviderIsNotNull()
+    public async Task AddEFSecondLevelCache_RegistersCustomHashProvider_WhenHashProviderIsNotNull()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -83,7 +83,7 @@ public class EFServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddEFSecondLevelCache_RegistersDefaultCacheProvider_WhenCacheProviderIsNull()
+    public async Task AddEFSecondLevelCache_RegistersDefaultCacheProvider_WhenCacheProviderIsNull()
     {
         var services = new ServiceCollection();
 
@@ -94,7 +94,7 @@ public class EFServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddEFSecondLevelCache_RegistersCustomCacheProvider_WhenCacheProviderIsNotNull()
+    public async Task AddEFSecondLevelCache_RegistersCustomCacheProvider_WhenCacheProviderIsNotNull()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -110,7 +110,7 @@ public class EFServiceCollectionExtensionsTests
 
     private class Logger<TCategoryName> : ILogger<TCategoryName>
     {
-        public void Log<TState>(LogLevel logLevel,
+        public async void Log<TState>(LogLevel logLevel,
             EventId eventId,
             TState state,
             Exception exception,
@@ -135,14 +135,14 @@ public class EFServiceCollectionExtensionsTests
 
     private class CustomCacheProvider : IEFCacheServiceProvider
     {
-        public void ClearAllCachedEntries() => throw new NotImplementedException();
+        public async Task ClearAllCachedEntries() => throw new NotImplementedException();
 
-        public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+        public Task<EFCachedData> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
             => throw new NotImplementedException();
 
-        public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
+        public async Task InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
             => throw new NotImplementedException();
 
-        public void InvalidateCacheDependencies(EFCacheKey cacheKey) => throw new NotImplementedException();
+        public async Task InvalidateCacheDependencies(EFCacheKey cacheKey) => throw new NotImplementedException();
     }
 }

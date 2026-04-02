@@ -1,4 +1,4 @@
-using System.Data.Common;
+﻿using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -15,5 +15,5 @@ public interface IEFCacheKeyProvider
     /// <param name="context">DbContext is a combination of the Unit Of Work and Repository patterns.</param>
     /// <param name="cachePolicy">determines the Expiration time of the cache.</param>
     /// <returns>Information of the computed key of the input LINQ query.</returns>
-    EFCacheKey GetEFCacheKey(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
+    Task<EFCacheKey> GetEFCacheKey(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
 }

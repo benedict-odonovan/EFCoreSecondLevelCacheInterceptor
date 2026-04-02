@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -18,7 +18,7 @@ public class EFMemoryCacheServiceProvider(
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+    public async Task InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -66,7 +66,7 @@ public class EFMemoryCacheServiceProvider(
     /// <summary>
     ///     Removes the cached entries added by this library.
     /// </summary>
-    public void ClearAllCachedEntries()
+    public async Task ClearAllCachedEntries()
     {
         signal.RemoveAllChangeTokens();
 
@@ -80,7 +80,7 @@ public class EFMemoryCacheServiceProvider(
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public async Task<EFCachedData?> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -94,7 +94,7 @@ public class EFMemoryCacheServiceProvider(
     ///     Invalidates all the cache entries which are dependent on any of the specified root keys.
     /// </summary>
     /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
-    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    public async Task InvalidateCacheDependencies(EFCacheKey cacheKey)
     {
         if (cacheKey == null)
         {

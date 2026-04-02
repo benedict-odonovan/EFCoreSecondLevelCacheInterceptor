@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)] // Workers: The number of threads to run the tests. Set it to 0 to use the number of core of your computer.
 
@@ -8,7 +8,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests;
 public class XxHashTests
 {
     [TestMethod]
-    public void TestXxHashReturnsCorrectValue()
+    public async Task TestXxHashReturnsCorrectValue()
     {
         byte[] data =
         {

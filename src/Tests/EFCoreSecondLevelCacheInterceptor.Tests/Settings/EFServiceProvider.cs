@@ -20,7 +20,7 @@ public static class EFServiceProvider
 {
     private static readonly AsyncNonKeyedLocker _locker = new();
 
-    public static IEFCacheServiceProvider GetCacheServiceProvider(TestCacheProvider provider)
+    public static async Task<IEFCacheServiceProvider> GetCacheServiceProvider(TestCacheProvider provider)
     {
         var services = new ServiceCollection();
         services.AddOptions();
@@ -119,12 +119,12 @@ public static class EFServiceProvider
                 throw new ArgumentOutOfRangeException(nameof(provider), provider, message: null);
         }
 
-        using var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
         var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
 
         try
         {
-            cacheProvider.ClearAllCachedEntries();
+            await cacheProvider.ClearAllCachedEntries();
         }
         catch (Exception ex)
         {
@@ -185,7 +185,7 @@ public static class EFServiceProvider
                 .ConfigureLogging(enable: true)
                 .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
-        using var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
 
         return serviceProvider.GetRequiredService<T>();
     }
@@ -518,7 +518,7 @@ public static class EFServiceProvider
             try
             {
                 var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
-                cacheServiceProvider.ClearAllCachedEntries();
+                cacheServiceProvider.ClearAllCachedEntries().Wait();
             }
             catch (Exception ex)
             {
@@ -549,7 +549,7 @@ public static class EFServiceProvider
             var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
 #pragma warning restore IDISP001
             var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
-            cacheServiceProvider.ClearAllCachedEntries();
+            await cacheServiceProvider.ClearAllCachedEntries();
 
             using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using EasyCaching.Core;
@@ -49,7 +49,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+    public async Task InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -78,11 +78,11 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                 continue;
             }
 
-            var items = easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+            var items = await easyCachingProvider.GetAsync<HashSet<string>>(rootCacheKey);
 
             if (items.IsNull)
             {
-                easyCachingProvider.Set(rootCacheKey, new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                await easyCachingProvider.SetAsync(rootCacheKey, new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     keyHash
                 }, timeout);
@@ -90,18 +90,18 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             else
             {
                 items.Value.Add(keyHash);
-                easyCachingProvider.Set(rootCacheKey, items.Value, timeout);
+                await easyCachingProvider.SetAsync(rootCacheKey, items.Value, timeout);
             }
         }
 
         // We don't support Sliding Expiration at this time. -> https://github.com/dotnetcore/EasyCaching/issues/113
-        easyCachingProvider.Set(keyHash, value, timeout);
+        await easyCachingProvider.SetAsync(keyHash, value, timeout);
     }
 
     /// <summary>
     ///     Removes the cached entries added by this library.
     /// </summary>
-    public void ClearAllCachedEntries()
+    public async Task ClearAllCachedEntries()
     {
         var easyCachingProvider = GetEasyCachingProvider(cacheKey: null);
 
@@ -118,11 +118,11 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                         message: "Please specify a CacheKeyPrefix by calling the `.UseCacheKeyPrefix(...)` method.");
                 }
 
-                hcp.RemoveByPrefix(cacheKeyPrefix);
+                await hcp.RemoveByPrefixAsync(cacheKeyPrefix);
 
                 break;
             case IEasyCachingProvider ecp:
-                ecp.Flush();
+                await ecp.FlushAsync();
 
                 break;
         }
@@ -137,7 +137,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public async Task<EFCachedData?> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -146,14 +146,14 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 
         var easyCachingProvider = GetEasyCachingProvider(cacheKey);
 
-        return easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value;
+        return (await easyCachingProvider.GetAsync<EFCachedData>(cacheKey.KeyHash)).Value;
     }
 
     /// <summary>
     ///     Invalidates all the cache entries which are dependent on any of the specified root keys.
     /// </summary>
     /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
-    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    public async Task InvalidateCacheDependencies(EFCacheKey cacheKey)
     {
         if (cacheKey is null)
         {
@@ -169,8 +169,8 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                 continue;
             }
 
-            var cachedValue = easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash);
-            var dependencyKeys = easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+            var cachedValue = await easyCachingProvider.GetAsync<EFCachedData>(cacheKey.KeyHash);
+            var dependencyKeys = await easyCachingProvider.GetAsync<HashSet<string>>(rootCacheKey);
 
             if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
             {
@@ -185,17 +185,17 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                         cacheKey);
                 }
 
-                ClearAllCachedEntries();
+                await ClearAllCachedEntries();
 
                 return;
             }
 
-            ClearDependencyValues(dependencyKeys, cacheKey);
-            easyCachingProvider.Remove(rootCacheKey);
+            await ClearDependencyValues(dependencyKeys, cacheKey);
+            await easyCachingProvider.RemoveAsync(rootCacheKey);
         }
     }
 
-    private void ClearDependencyValues(CacheValue<HashSet<string>> dependencyKeys, EFCacheKey cacheKey)
+    private async Task ClearDependencyValues(CacheValue<HashSet<string>> dependencyKeys, EFCacheKey cacheKey)
     {
         if (dependencyKeys.IsNull)
         {
@@ -206,7 +206,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 
         foreach (var dependencyKey in dependencyKeys.Value)
         {
-            easyCachingProvider.Remove(dependencyKey);
+            await easyCachingProvider.RemoveAsync(dependencyKey);
         }
     }
 

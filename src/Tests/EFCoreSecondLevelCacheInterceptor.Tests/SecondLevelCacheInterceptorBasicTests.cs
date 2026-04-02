@@ -1,4 +1,4 @@
-using CacheManager.Serialization.Json;
+﻿using CacheManager.Serialization.Json;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +18,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
     [DataRow(TestCacheProvider.StackExchangeRedis)]
-    public void TestIncludeMethodAffectsKeyCache(TestCacheProvider cacheProvider)
+    public async Task TestIncludeMethodAffectsKeyCache(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -45,7 +45,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
     [DataRow(TestCacheProvider.StackExchangeRedis)]
-    public void TestQueriesUsingDifferentParameterValuesWillNotUseTheCache(TestCacheProvider cacheProvider)
+    public async Task TestQueriesUsingDifferentParameterValuesWillNotUseTheCache(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -92,7 +92,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestSecondLevelCacheInTwoDifferentContextsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
+    public async Task TestSecondLevelCacheInTwoDifferentContextsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
     {
         var isActive = true;
         var name = "Product2";
@@ -125,7 +125,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestSecondLevelCacheUsingDifferentSyncMethods(TestCacheProvider cacheProvider)
+    public async Task TestSecondLevelCacheUsingDifferentSyncMethods(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -179,7 +179,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestSecondLevelCacheUsingTwoCountMethods(TestCacheProvider cacheProvider)
+    public async Task TestSecondLevelCacheUsingTwoCountMethods(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -209,7 +209,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestSecondLevelCacheUsingProjections(TestCacheProvider cacheProvider)
+    public async Task TestSecondLevelCacheUsingProjections(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -241,7 +241,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestIncludeMethodAndProjectionAffectsKeyCache(TestCacheProvider cacheProvider)
+    public async Task TestIncludeMethodAndProjectionAffectsKeyCache(TestCacheProvider cacheProvider)
     {
         var isActive = true;
         var name = "Product1";
@@ -320,7 +320,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestNullValuesWillUseTheCache(TestCacheProvider cacheProvider)
+    public async Task TestNullValuesWillUseTheCache(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -347,7 +347,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestEqualsMethodWillUseTheCache(TestCacheProvider cacheProvider)
+    public async Task TestEqualsMethodWillUseTheCache(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -385,7 +385,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void Test2DifferentCollectionsWillNotUseTheCache(TestCacheProvider cacheProvider)
+    public async Task Test2DifferentCollectionsWillNotUseTheCache(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -415,7 +415,7 @@ public class SecondLevelCacheInterceptorBasicTests
             });
 
     [TestMethod]
-    public void TestJsonNet()
+    public async Task TestJsonNet()
     {
         var rnd = new Random();
         var utcNow = DateTimeOffset.UtcNow;
@@ -456,7 +456,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestUsersWithAllDataTypes(TestCacheProvider cacheProvider)
+    public async Task TestUsersWithAllDataTypes(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -479,7 +479,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestAllDateTypes(TestCacheProvider cacheProvider)
+    public async Task TestAllDateTypes(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -508,7 +508,7 @@ public class SecondLevelCacheInterceptorBasicTests
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
     [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
     [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void TestSecondLevelCache_with_additional_tags_does_not_hit_the_database(TestCacheProvider cacheProvider)
+    public async Task TestSecondLevelCache_with_additional_tags_does_not_hit_the_database(TestCacheProvider cacheProvider)
         => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
             (context, loggerProvider) =>
             {
@@ -535,7 +535,7 @@ public class SecondLevelCacheInterceptorBasicTests
             });
 
     [TestMethod]
-    public void TestInstantiatingContextWithoutDI()
+    public async Task TestInstantiatingContextWithoutDI()
     {
         var services = new ServiceCollection();
         services.AddOptions();
@@ -548,7 +548,7 @@ public class SecondLevelCacheInterceptorBasicTests
 
         services.AddSingleton(_ => configuration);
 
-        using var loggerProvider = new DebugLoggerProvider();
+        var loggerProvider = new DebugLoggerProvider();
 
         services.AddLogging(cfg
             => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Debug));
@@ -575,11 +575,11 @@ public class SecondLevelCacheInterceptorBasicTests
 
         using (var context = new ApplicationDbContext(options))
         {
-            var items1 = context.DateTypes.Cacheable().ToList();
+            var items1 = await context.DateTypes.Cacheable().ToListAsync();
             Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
             Assert.IsNotNull(items1);
 
-            var items2 = context.DateTypes.Cacheable().ToList();
+            var items2 = await context.DateTypes.Cacheable().ToListAsync();
             Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
             Assert.IsNotNull(items2);
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CacheManager.Core;
 using Microsoft.Extensions.Logging;
@@ -37,7 +37,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
         // Occurs when an item was removed by the cache handle due to expiration or e.g. memory pressure eviction.
         // Without _dependenciesCacheManager items, we can't invalidate cached items on Insert/Update/Delete.
         // So to prevent stale reads, we have to clear all cached data in this case.
-        _dependenciesCacheManager.OnRemoveByHandle += (sender, args) => ClearAllCachedEntries();
+        _dependenciesCacheManager.OnRemoveByHandle += async (sender, args) => await ClearAllCachedEntries();
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+    public async Task InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -97,7 +97,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// <summary>
     ///     Removes the cached entries added by this library.
     /// </summary>
-    public void ClearAllCachedEntries()
+    public async Task ClearAllCachedEntries()
     {
         _valuesCacheManager.Clear();
         _dependenciesCacheManager.Clear();
@@ -112,7 +112,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public async Task<EFCachedData?> GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -126,7 +126,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     ///     Invalidates all of the cache entries which are dependent on any of the specified root keys.
     /// </summary>
     /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
-    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    public async Task InvalidateCacheDependencies(EFCacheKey cacheKey)
     {
         if (cacheKey is null)
         {
@@ -156,7 +156,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
                         cacheKey);
                 }
 
-                ClearAllCachedEntries();
+                await ClearAllCachedEntries();
 
                 return;
             }

@@ -58,7 +58,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -88,7 +88,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -118,7 +118,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -151,7 +151,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
             .Returns(new ValueTask<IDisposable>(mockDisposable));
 
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -181,7 +181,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -211,7 +211,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -242,7 +242,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -272,7 +272,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -302,7 +302,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -335,7 +335,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
             .Returns(new ValueTask<IDisposable>(mockDisposable));
 
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -365,7 +365,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -395,7 +395,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -424,7 +424,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -452,7 +452,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -480,7 +480,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -514,7 +514,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
             .Returns(new ValueTask<IDisposable>(mockDisposable));
 
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -542,7 +542,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -570,7 +570,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -602,7 +602,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -633,7 +633,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -664,7 +664,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -698,7 +698,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
             .Returns(new ValueTask<IDisposable>(mockDisposable));
 
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -729,7 +729,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -760,7 +760,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -791,7 +791,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -821,7 +821,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -851,7 +851,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -884,7 +884,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
             .Returns(new ValueTask<IDisposable>(mockDisposable));
 
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -914,7 +914,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -944,7 +944,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -975,7 +975,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -1005,7 +1005,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -1035,7 +1035,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -1068,7 +1068,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
             .Returns(new ValueTask<IDisposable>(mockDisposable));
 
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -1098,7 +1098,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
@@ -1128,7 +1128,7 @@ public class SecondLevelCacheInterceptorTests
 
         using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
         lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).ReturnsAsync(expected);
 
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 

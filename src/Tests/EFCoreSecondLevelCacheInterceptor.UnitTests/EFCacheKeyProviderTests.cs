@@ -114,7 +114,7 @@ public class EFCacheKeyProviderTests
 
     [Fact]
     [SuppressMessage(category: "ReSharper", checkId: "AssignNullToNotNullAttribute")]
-    public void GetEFCacheKey_ThrowsArgumentNullException_WhenContextIsNull()
+    public async Task GetEFCacheKey_ThrowsArgumentNullException_WhenContextIsNull()
     {
         // Arrange
         DbCommand command = null;
@@ -122,15 +122,15 @@ public class EFCacheKeyProviderTests
         EFCachePolicy cachePolicy = null;
 
         // Act
-        void Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
+        Task Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(paramName: "context", Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(paramName: "context", Act);
     }
 
     [Fact]
     [SuppressMessage(category: "ReSharper", checkId: "AssignNullToNotNullAttribute")]
-    public void GetEFCacheKey_ThrowsArgumentNullException_WhenCommandIsNull()
+    public async Task GetEFCacheKey_ThrowsArgumentNullException_WhenCommandIsNull()
     {
         // Arrange
         DbCommand command = null;
@@ -138,14 +138,14 @@ public class EFCacheKeyProviderTests
         EFCachePolicy cachePolicy = null;
 
         // Act
-        void Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
+        Task Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(paramName: "command", Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(paramName: "command", Act);
     }
 
     [Fact]
-    public void GetEFCacheKey_ThrowsArgumentNullException_WhenCachePolicyIsNull()
+    public async Task GetEFCacheKey_ThrowsArgumentNullException_WhenCachePolicyIsNull()
     {
         // Arrange
         var command = Mock.Of<DbCommand>();
@@ -154,14 +154,14 @@ public class EFCacheKeyProviderTests
 
         // Act
         // ReSharper disable once AssignNullToNotNullAttribute
-        void Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
+        Task Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(paramName: "cachePolicy", Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(paramName: "cachePolicy", Act);
     }
 
     [Fact]
-    public void GetEFCacheKey_ReturnsExpectedCacheKey()
+    public async Task GetEFCacheKey_ReturnsExpectedCacheKey()
     {
         // Arrange
         var context = Mock.Of<DbContext>();
@@ -197,7 +197,7 @@ public class EFCacheKeyProviderTests
         dbParameterCollectionMock.Setup(x => x.GetEnumerator()).Returns(enumerator);
 
         _cacheDependenciesProcessorMock.Setup(x => x.GetCacheDependencies(commandMock.Object, context, cachePolicy))
-            .Returns(expected.CacheDependencies as SortedSet<string>);
+            .ReturnsAsync(expected.CacheDependencies as SortedSet<string>);
 
         dbParameterMock.Setup(x => x.ParameterName).Returns(value: "Name");
         dbParameterMock.Setup(x => x.Value).Returns(value: "Value");
@@ -207,14 +207,14 @@ public class EFCacheKeyProviderTests
         dbParameterMock.Setup(x => x.Direction).Returns(ParameterDirection.Input);
 
         // Act
-        var actual = _cacheKeyProvider.GetEFCacheKey(commandMock.Object, context, cachePolicy);
+        var actual = await _cacheKeyProvider.GetEFCacheKey(commandMock.Object, context, cachePolicy);
 
         // Assert
         Assert.Equal(expected, actual);
     }
 
     [Fact]
-    public void GetEFCacheKey_ReturnsExpectedCacheKeyWithPrefix()
+    public async Task GetEFCacheKey_ReturnsExpectedCacheKeyWithPrefix()
     {
         // Arrange
         var context = Mock.Of<DbContext>();
@@ -252,7 +252,7 @@ public class EFCacheKeyProviderTests
         dbParameterCollectionMock.Setup(x => x.GetEnumerator()).Returns(enumerator);
 
         _cacheDependenciesProcessorMock.Setup(x => x.GetCacheDependencies(commandMock.Object, context, cachePolicy))
-            .Returns(expected.CacheDependencies as SortedSet<string>);
+            .ReturnsAsync(expected.CacheDependencies as SortedSet<string>);
 
         dbParameterMock.Setup(x => x.ParameterName).Returns(value: "Name");
         dbParameterMock.Setup(x => x.Value).Returns(value: "Value");
@@ -262,7 +262,7 @@ public class EFCacheKeyProviderTests
         dbParameterMock.Setup(x => x.Direction).Returns(ParameterDirection.Input);
 
         // Act
-        var actual = _cacheKeyProvider.GetEFCacheKey(commandMock.Object, context, cachePolicy);
+        var actual = await _cacheKeyProvider.GetEFCacheKey(commandMock.Object, context, cachePolicy);
 
         // Assert
         Assert.Equal(expected, actual);
