@@ -355,6 +355,7 @@ public static class EFServiceProvider
                 {
                     busConf.Endpoints.Add(new ServerEndPoint(host: "127.0.0.1", port: 6379));
                     busConf.AllowAdmin = true;
+                    busConf.SerializerName = "MySerializer";
                 });
         });
     }
