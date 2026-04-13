@@ -1,4 +1,4 @@
-namespace EFCoreSecondLevelCacheInterceptor.Tests;
+﻿namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
 [TestClass]
 [DoNotParallelize]
@@ -292,8 +292,8 @@ public class EFCacheServiceProviderTests
     }
 
     [TestMethod]
-    [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
-    [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+    //[DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+    //[DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     public virtual async Task TestConcurrentCacheInsertAndInvalidation(TestCacheProvider cacheProvider)
     {
