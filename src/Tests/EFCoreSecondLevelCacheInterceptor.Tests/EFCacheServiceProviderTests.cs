@@ -1,6 +1,7 @@
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
 [TestClass]
+[DoNotParallelize]
 public class EFCacheServiceProviderTests
 {
     [TestMethod]
