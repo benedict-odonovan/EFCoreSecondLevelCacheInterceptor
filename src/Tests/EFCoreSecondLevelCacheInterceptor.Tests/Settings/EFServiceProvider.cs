@@ -214,6 +214,10 @@ public static class EFServiceProvider
         {
             options.ConfigureLogging(enable: true).UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1));
 
+            // Isolate cache entries per test-run service provider to avoid cross-test leakage
+            // from persistent/distributed providers (e.g., StackExchange.Redis).
+            options.UseCacheKeyPrefix($"EF_TEST_{Guid.NewGuid():N}_");
+
             switch (cacheProvider)
             {
                 case TestCacheProvider.BuiltInInMemory:
