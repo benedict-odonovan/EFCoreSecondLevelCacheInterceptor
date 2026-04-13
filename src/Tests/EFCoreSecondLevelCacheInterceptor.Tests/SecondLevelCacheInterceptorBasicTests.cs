@@ -554,7 +554,8 @@ public class SecondLevelCacheInterceptorBasicTests
             => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Debug));
 
         services.AddEFSecondLevelCache(options
-            => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 50)));
+            => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 50))
+                .ConfigureLogging(enable: true));
 
         using var serviceProvider = services.BuildServiceProvider();
 
