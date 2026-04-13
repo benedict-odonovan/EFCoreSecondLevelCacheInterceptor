@@ -119,7 +119,7 @@ public static class EFServiceProvider
                 throw new ArgumentOutOfRangeException(nameof(provider), provider, message: null);
         }
 
-        using var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
         var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
 
         try
