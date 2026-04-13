@@ -1,4 +1,4 @@
-using CacheManager.Serialization.Json;
+﻿using CacheManager.Serialization.Json;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -353,7 +353,7 @@ public class SecondLevelCacheInterceptorBasicTests
             {
                 var item1 = context.Products
                     .Where(product
-                        => product.ProductId == 2 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
+                        => product.ProductId == 2 && product.ProductName == "Product1")
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -362,7 +362,7 @@ public class SecondLevelCacheInterceptorBasicTests
 
                 var item2 = context.Products
                     .Where(product
-                        => product.ProductId == 2 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
+                        => product.ProductId == 2 && product.ProductName == "Product1")
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -371,7 +371,7 @@ public class SecondLevelCacheInterceptorBasicTests
 
                 var item3 = context.Products
                     .Where(product
-                        => product.ProductId == 1 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
+                        => product.ProductId == 1 && product.ProductName == "Product1")
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
