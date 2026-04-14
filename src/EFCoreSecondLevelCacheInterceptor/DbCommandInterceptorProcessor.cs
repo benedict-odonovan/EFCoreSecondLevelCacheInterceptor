@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -17,6 +19,14 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     private readonly IEFCacheServiceProvider _cacheService;
     private readonly IEFCacheServiceCheck _cacheServiceCheck;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+
+    // Stores a generation snapshot per in-flight DbCommand so that ProcessExecutedCommands can
+    // detect whether a cache invalidation occurred while the DB query was executing.
+    // ConditionalWeakTable uses weak keys so leaked entries (e.g. on DB exception) are
+    // automatically collected when the DbCommand is GC'd.
+    private readonly ConditionalWeakTable<DbCommand, Dictionary<string, long>> _generationSnapshots = new();
+
+    private readonly IEFCacheInvalidationTracker _invalidationTracker;
     private readonly IDbCommandIgnoreCachingProcessor _ignoreCachingProcessor;
     private readonly ILogger<DbCommandInterceptorProcessor> _interceptorProcessorLogger;
     private readonly IEFDebugLogger _logger;
@@ -31,7 +41,8 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         IEFCacheKeyProvider cacheKeyProvider,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IEFCacheServiceCheck cacheServiceCheck,
-        IDbCommandIgnoreCachingProcessor ignoreCachingProcessor)
+        IDbCommandIgnoreCachingProcessor ignoreCachingProcessor,
+        IEFCacheInvalidationTracker invalidationTracker)
     {
         _cacheService = cacheService;
         _cacheDependenciesProcessor = cacheDependenciesProcessor;
@@ -40,6 +51,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         _interceptorProcessorLogger = interceptorProcessorLogger;
         _cacheServiceCheck = cacheServiceCheck;
         _ignoreCachingProcessor = ignoreCachingProcessor;
+        _invalidationTracker = invalidationTracker ?? throw new ArgumentNullException(nameof(invalidationTracker));
 
         if (cacheSettings == null)
         {
@@ -102,6 +114,28 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 if (_logger.IsLoggerEnabled)
                 {
                     var message = $"Skipping a none-cachable command[{commandText}].";
+                    _interceptorProcessorLogger.LogDebug(message);
+                    _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText, efCacheKey);
+                }
+
+                return result;
+            }
+
+            // Guard against the issue-177 race: a SELECT that started before a cache
+            // invalidation must not re-insert its now-stale result.  The snapshot was taken
+            // in ProcessExecutingCommands (under the read lock) and the generation counters
+            // were incremented by the invalidation (also under the write lock), so if any
+            // counter has advanced the data from this SELECT is stale.
+            _generationSnapshots.TryGetValue(command, out var snapshot);
+            _generationSnapshots.Remove(command);
+
+            if (snapshot != null && _invalidationTracker.IsSnapshotStale(snapshot))
+            {
+                if (_logger.IsLoggerEnabled)
+                {
+                    var message =
+                        $"Skipping caching of [{commandText}]: a cache invalidation occurred while the query was executing.";
+
                     _interceptorProcessorLogger.LogDebug(message);
                     _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText, efCacheKey);
                 }
@@ -256,6 +290,15 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                     _interceptorProcessorLogger.LogDebug(message: "[{EfCacheKey}] was not present in the cache.",
                         efCacheKey);
                 }
+
+                // Cache miss: the DB will execute this query.  Snapshot the current invalidation
+                // generation for all dependencies so ProcessExecutedCommands can detect whether
+                // a concurrent invalidation fired before the result is inserted.
+                // The snapshot is taken while the read lock is still held by the interceptor, so
+                // no write (invalidation) can interleave between the miss check and the snapshot.
+                var snapshot = _invalidationTracker.TakeSnapshot(efCacheKey.CacheDependencies);
+                _generationSnapshots.Remove(command);
+                _generationSnapshots.Add(command, snapshot);
 
                 return result;
             }

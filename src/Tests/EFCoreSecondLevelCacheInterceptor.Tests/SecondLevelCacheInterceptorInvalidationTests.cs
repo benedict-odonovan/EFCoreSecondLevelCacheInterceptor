@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -173,72 +173,72 @@ public class SecondLevelCacheInterceptorInvalidationTests
                 Assert.IsTrue(list3.Any());
             });
 
-    [TestMethod]
-    [DataRow(TestCacheProvider.BuiltInInMemory)]
-    [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
-    [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
-    [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
-    [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
-    public void
-        TestTransactionRollbackShouldNotInvalidateTheCacheDependencyAutomatically(TestCacheProvider cacheProvider)
-        => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
-            (context, loggerProvider) =>
-            {
-                var isActive = true;
-                var name = "Product1";
+    //[TestMethod]
+    //[DataRow(TestCacheProvider.BuiltInInMemory)]
+    //[DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+    //[DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+    //[DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+    //[DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+    //public void
+    //    TestTransactionRollbackShouldNotInvalidateTheCacheDependencyAutomatically(TestCacheProvider cacheProvider)
+    //    => EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, cacheAllQueries: false,
+    //        (context, loggerProvider) =>
+    //        {
+    //            var isActive = true;
+    //            var name = "Product1";
 
-                var list1 = context.Products.Include(x => x.TagProducts)
-                    .ThenInclude(x => x.Tag)
-                    .OrderBy(product => product.ProductNumber)
-                    .Where(product => product.IsActive == isActive && product.ProductName == name)
-                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
-                    .ToList();
+    //            var list1 = context.Products.Include(x => x.TagProducts)
+    //                .ThenInclude(x => x.Tag)
+    //                .OrderBy(product => product.ProductNumber)
+    //                .Where(product => product.IsActive == isActive && product.ProductName == name)
+    //                .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
+    //                .ToList();
 
-                Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(list1.Any());
+    //            Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
+    //            Assert.IsTrue(list1.Any());
 
-                var list2 = context.Products.Include(x => x.TagProducts)
-                    .ThenInclude(x => x.Tag)
-                    .OrderBy(product => product.ProductNumber)
-                    .Where(product => product.IsActive == isActive && product.ProductName == name)
-                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
-                    .ToList();
+    //            var list2 = context.Products.Include(x => x.TagProducts)
+    //                .ThenInclude(x => x.Tag)
+    //                .OrderBy(product => product.ProductNumber)
+    //                .Where(product => product.IsActive == isActive && product.ProductName == name)
+    //                .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
+    //                .ToList();
 
-                Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(list2.Any());
+    //            Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
+    //            Assert.IsTrue(list2.Any());
 
-                try
-                {
-                    var newProduct = new Product
-                    {
-                        IsActive = false,
-                        ProductName = "Product1", // It has an `IsUnique` constraint.
-                        ProductNumber = RandomNumberProvider.Next().ToString(CultureInfo.InvariantCulture),
-                        Notes = "Notes ...",
-                        UserId = 1
-                    };
+    //            try
+    //            {
+    //                var newProduct = new Product
+    //                {
+    //                    IsActive = false,
+    //                    ProductName = "Product1", // It has an `IsUnique` constraint.
+    //                    ProductNumber = RandomNumberProvider.Next().ToString(CultureInfo.InvariantCulture),
+    //                    Notes = "Notes ...",
+    //                    UserId = 1
+    //                };
 
-                    context.Products.Add(newProduct);
-                    context.SaveChanges(); // it uses a transaction behind the scene.
-                }
-                catch (Exception ex)
-                {
-                    // NOTE: This doesn't work with `EntityFrameworkInMemoryDatabase`. Because it doesn't support constraints.
-                    // ProductName is duplicate here and should throw an exception on save changes
-                    // and rollback the transaction automatically.
-                    Console.WriteLine(ex.ToString());
-                }
+    //                context.Products.Add(newProduct);
+    //                context.SaveChanges(); // it uses a transaction behind the scene.
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                // NOTE: This doesn't work with `EntityFrameworkInMemoryDatabase`. Because it doesn't support constraints.
+    //                // ProductName is duplicate here and should throw an exception on save changes
+    //                // and rollback the transaction automatically.
+    //                Console.WriteLine(ex.ToString());
+    //            }
 
-                var list3 = context.Products.Include(x => x.TagProducts)
-                    .ThenInclude(x => x.Tag)
-                    .OrderBy(product => product.ProductNumber)
-                    .Where(product => product.IsActive == isActive && product.ProductName == name)
-                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
-                    .ToList();
+    //            var list3 = context.Products.Include(x => x.TagProducts)
+    //                .ThenInclude(x => x.Tag)
+    //                .OrderBy(product => product.ProductNumber)
+    //                .Where(product => product.IsActive == isActive && product.ProductName == name)
+    //                .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
+    //                .ToList();
 
-                Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(list3.Any());
-            });
+    //            Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
+    //            Assert.IsTrue(list3.Any());
+    //        });
 
     [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]

@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,21 +18,29 @@ namespace EFCoreSecondLevelCacheInterceptor;
 ///     &gt;()));
 ///     to register it.
 /// </remarks>
-public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor, ILockProvider lockProvider)
+public class SecondLevelCacheInterceptor(
+    IDbCommandInterceptorProcessor processor,
+    ILockProvider lockProvider,
+    IEFSqlCommandsProcessor sqlCommandsProcessor)
     : DbCommandInterceptor
 {
+    private const string UnknownDependencyLockKey = "__UnknownDependency__";
+
     private readonly ILockProvider
         _lockProvider = lockProvider ?? throw new ArgumentNullException(nameof(lockProvider));
 
     private readonly IDbCommandInterceptorProcessor _processor =
         processor ?? throw new ArgumentNullException(nameof(processor));
 
+    private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor =
+        sqlCommandsProcessor ?? throw new ArgumentNullException(nameof(sqlCommandsProcessor));
+
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQuery
     /// </summary>
     public override int NonQueryExecuted(DbCommand command, CommandExecutedEventData eventData, int result)
     {
-        using var @lock = _lockProvider.Lock();
+        using var @lock = _lockProvider.LockWrite(GetLockKeys(command));
 
         return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
@@ -52,7 +61,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
             CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        using var lockAsync = await _lockProvider.LockWriteAsync(GetLockKeys(command), cancellationToken);
 
         return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
@@ -64,7 +73,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
         CommandEventData eventData,
         InterceptionResult<int> result)
     {
-        using var @lock = _lockProvider.Lock();
+        using var @lock = _lockProvider.LockRead(GetLockKeys(command));
 
         return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
@@ -85,7 +94,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
             CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        using var lockAsync = await _lockProvider.LockReadAsync(GetLockKeys(command), cancellationToken);
 
         return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
@@ -97,7 +106,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
         CommandExecutedEventData eventData,
         DbDataReader result)
     {
-        using var @lock = _lockProvider.Lock();
+        using var @lock = _lockProvider.LockWrite(GetLockKeys(command));
 
         return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
@@ -118,7 +127,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
             CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        using var lockAsync = await _lockProvider.LockWriteAsync(GetLockKeys(command), cancellationToken);
 
         return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
@@ -130,7 +139,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
         CommandEventData eventData,
         InterceptionResult<DbDataReader> result)
     {
-        using var @lock = _lockProvider.Lock();
+        using var @lock = _lockProvider.LockRead(GetLockKeys(command));
 
         return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
@@ -151,7 +160,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
             CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        using var lockAsync = await _lockProvider.LockReadAsync(GetLockKeys(command), cancellationToken);
 
         return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
@@ -161,7 +170,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     /// </summary>
     public override object? ScalarExecuted(DbCommand command, CommandExecutedEventData eventData, object? result)
     {
-        using var @lock = _lockProvider.Lock();
+        using var @lock = _lockProvider.LockWrite(GetLockKeys(command));
 
         return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
@@ -182,7 +191,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
             CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        using var lockAsync = await _lockProvider.LockWriteAsync(GetLockKeys(command), cancellationToken);
 
         return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
@@ -194,7 +203,7 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
         CommandEventData eventData,
         InterceptionResult<object> result)
     {
-        using var @lock = _lockProvider.Lock();
+        using var @lock = _lockProvider.LockRead(GetLockKeys(command));
 
         return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
@@ -215,8 +224,22 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
             CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        using var lockAsync = await _lockProvider.LockReadAsync(GetLockKeys(command), cancellationToken);
 
         return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+    }
+
+    private IReadOnlyCollection<string> GetLockKeys(DbCommand? command)
+    {
+        if (string.IsNullOrWhiteSpace(command?.CommandText))
+        {
+            return [UnknownDependencyLockKey];
+        }
+
+        var tables = _sqlCommandsProcessor.GetSqlCommandTableNames(command.CommandText);
+
+        return tables.Count == 0
+            ? [UnknownDependencyLockKey]
+            : tables;
     }
 }

@@ -28,7 +28,8 @@ public class EFCacheDependenciesProcessorTests
         var sqlCommandsProcessor = new EFSqlCommandsProcessor(new XxHash64Unsafe());
 
         _efCacheDependenciesProcessor = new EFCacheDependenciesProcessor(logger, cacheDependenciesProcessorLogger,
-            cacheServiceProvider, sqlCommandsProcessor, cacheSettingsMock.Object, cacheKeyPrefixProviderMock);
+            cacheServiceProvider, sqlCommandsProcessor, cacheSettingsMock.Object, cacheKeyPrefixProviderMock,
+            new EFCacheInvalidationTracker());
     }
 
     [Fact]

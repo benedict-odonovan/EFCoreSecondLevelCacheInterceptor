@@ -17,6 +17,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     private readonly IEFCacheServiceProvider _cacheServiceProvider;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
     private readonly ILogger<EFCacheDependenciesProcessor> _dependenciesProcessorLogger;
+    private readonly IEFCacheInvalidationTracker _invalidationTracker;
     private readonly IEFDebugLogger _logger;
     private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
@@ -28,13 +29,15 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         IEFCacheServiceProvider cacheServiceProvider,
         IEFSqlCommandsProcessor sqlCommandsProcessor,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-        IEFCacheKeyPrefixProvider cacheKeyPrefixProvider)
+        IEFCacheKeyPrefixProvider cacheKeyPrefixProvider,
+        IEFCacheInvalidationTracker invalidationTracker)
     {
         _logger = logger;
         _dependenciesProcessorLogger = dependenciesProcessorLogger;
         _cacheServiceProvider = cacheServiceProvider;
         _sqlCommandsProcessor = sqlCommandsProcessor;
         _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
+        _invalidationTracker = invalidationTracker ?? throw new ArgumentNullException(nameof(invalidationTracker));
 
         if (cacheSettings == null)
         {
@@ -147,6 +150,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
         var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
         cacheKey.CacheDependencies.Add($"{cacheKeyPrefix}{EFCachePolicy.UnknownsCacheDependency}");
+        _invalidationTracker.IncrementGenerations(cacheKey.CacheDependencies);
         _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
 
         if (_logger.IsLoggerEnabled)

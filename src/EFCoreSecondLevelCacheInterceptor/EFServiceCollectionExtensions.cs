@@ -28,6 +28,7 @@ public static class EFServiceCollectionExtensions
         services.TryAddSingleton<IEFSqlCommandsProcessor, EFSqlCommandsProcessor>();
         services.TryAddSingleton<IEFCacheDependenciesProcessor, EFCacheDependenciesProcessor>();
         services.TryAddSingleton<ILockProvider, LockProvider>();
+        services.TryAddSingleton<IEFCacheInvalidationTracker, EFCacheInvalidationTracker>();
         services.TryAddSingleton<IDbCommandIgnoreCachingProcessor, DbCommandIgnoreCachingProcessor>();
         services.TryAddSingleton<IDbCommandInterceptorProcessor, DbCommandInterceptorProcessor>();
         services.TryAddSingleton<SecondLevelCacheInterceptor>();

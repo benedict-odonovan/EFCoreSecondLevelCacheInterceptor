@@ -119,7 +119,7 @@ public static class EFServiceProvider
                 throw new ArgumentOutOfRangeException(nameof(provider), provider, message: null);
         }
 
-        using var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
         var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
 
         try
@@ -213,6 +213,10 @@ public static class EFServiceProvider
         services.AddEFSecondLevelCache(options =>
         {
             options.ConfigureLogging(enable: true).UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1));
+
+            // Isolate cache entries per test-run service provider to avoid cross-test leakage
+            // from persistent/distributed providers (e.g., StackExchange.Redis).
+            options.UseCacheKeyPrefix($"EF_TEST_{Guid.NewGuid():N}_");
 
             switch (cacheProvider)
             {
@@ -355,6 +359,7 @@ public static class EFServiceProvider
                 {
                     busConf.Endpoints.Add(new ServerEndPoint(host: "127.0.0.1", port: 6379));
                     busConf.AllowAdmin = true;
+                    busConf.SerializerName = "MySerializer";
                 });
         });
     }
