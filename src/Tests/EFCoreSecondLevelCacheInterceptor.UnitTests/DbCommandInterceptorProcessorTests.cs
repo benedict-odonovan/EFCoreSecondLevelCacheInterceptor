@@ -45,7 +45,8 @@ public class DbCommandInterceptorProcessorTests
 
         _processor = new DbCommandInterceptorProcessor(_loggerMock.Object, interceptorProcessorLoggerMock.Object,
             _cacheServiceMock.Object, _cacheDependenciesProcessorMock.Object, _cacheKeyProviderMock.Object,
-            cacheSettingsMock.Object, _cacheServiceCheckMock.Object, _ignoreCachingProcessor);
+            cacheSettingsMock.Object, _cacheServiceCheckMock.Object, _ignoreCachingProcessor,
+            Mock.Of<IEFCacheInvalidationTracker>());
     }
 
     [Fact]
@@ -65,7 +66,8 @@ public class DbCommandInterceptorProcessorTests
             cacheService, cacheDependenciesProcessor, cacheKeyProvider,
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            cacheSettings: null, cacheServiceCheck, ignoreCachingProcessor));
+            cacheSettings: null, cacheServiceCheck, ignoreCachingProcessor,
+            Mock.Of<IEFCacheInvalidationTracker>()));
     }
 
     [Fact]
@@ -83,7 +85,8 @@ public class DbCommandInterceptorProcessorTests
 
         // Act
         var processor = new DbCommandInterceptorProcessor(logger, interceptorProcessorLogger, cacheService,
-            cacheDependenciesProcessor, cacheKeyProvider, cacheSettings, cacheServiceCheck, ignoreCachingProcessor);
+            cacheDependenciesProcessor, cacheKeyProvider, cacheSettings, cacheServiceCheck, ignoreCachingProcessor,
+            Mock.Of<IEFCacheInvalidationTracker>());
 
         // Assert
         Assert.NotNull(processor);

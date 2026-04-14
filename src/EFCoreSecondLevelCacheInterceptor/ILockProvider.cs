@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,12 +11,24 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public interface ILockProvider : IDisposable
 {
     /// <summary>
-    ///     Tries to enter the sync lock
+    ///     Tries to enter keyed sync write locks in a deterministic order
     /// </summary>
-    IDisposable? Lock(CancellationToken cancellationToken = default);
+    IDisposable? LockWrite(IReadOnlyCollection<string>? lockKeys, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Tries to enter the async lock
+    ///     Tries to enter keyed async write locks in a deterministic order
     /// </summary>
-    ValueTask<IDisposable?> LockAsync(CancellationToken cancellationToken = default);
+    ValueTask<IDisposable?> LockWriteAsync(IReadOnlyCollection<string>? lockKeys,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Tries to enter keyed sync read locks in a deterministic order (shared; multiple concurrent readers are allowed)
+    /// </summary>
+    IDisposable? LockRead(IReadOnlyCollection<string>? lockKeys, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Tries to enter keyed async read locks in a deterministic order (shared; multiple concurrent readers are allowed)
+    /// </summary>
+    ValueTask<IDisposable?> LockReadAsync(IReadOnlyCollection<string>? lockKeys,
+        CancellationToken cancellationToken = default);
 }
